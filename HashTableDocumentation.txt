@@ -1,0 +1,395 @@
+
+Шаблоны:
+	
+    template<typename KeyType, typename Hasher = std::hash<KeyType>, typename EqualComp = std::equal_to<KeyType>>                             |
+    class HashSet;                                                                                                                            |     
+                                                                                                                                              |      HashSet.h
+    template<typename KeyType, typename Hasher = std::hash<KeyType>, typename EqualComp = std::equal_to<KeyType>>                             |     
+    class HashMultiSet;                                                                                                                       |
+                                                                                                                                              |    ---------------
+    template<typename KeyType, typename ValueType, typename Hasher = std::hash<KeyType>, typename EqualComp = std::equal_to<KeyType>>         |
+    class HashMap;                                                                                                                            |      HashMap.h
+                                                                                                                                              |
+    template<typename KeyType, typename ValueType, typename Hasher = std::hash<KeyType>, typename EqualComp = std::equal_to<KeyType>>         |
+    class HashMultiMap;                                                                                                                       |
+
+
+Public Types:
+	
+	typename KeyType
+	typename ValueType(Только для HashMap и HashMultiMap)
+	typename PairType(Tолько для HashMap и HashMultiMap)
+	typename EqualCompType
+	typename HasherType
+	typename IteratorType
+	typename ConstIteratorType(Только для TreeMap и TreeMultiMap)
+
+
+Public Методы:
+
+    (constructor)                    -                  Создает и инициализирует текущий экземпляр
+    (destructor)                     -                  Уничтожает текущий экземпляр
+
+    Свойства_______________________________________________________________________________________________________
+
+    size                             -                  Возвращает текущее количество элементов в контейнере
+    isEmpty                          -                  Проверяет пустой ли контейнер
+    getBucketCount                   -                  Возвращает текущее количество бакетов
+    getLoadFactor                    -                  Возвращает текущий loadFactor
+    getMaxLoadFactor                 -                  Возвращает текущий maxLoadFactor              
+    getGainFactor                    -                  Возвращает текущий gainFactor
+
+    reserve                          -                  Резервирует место под конкретное количество элементов
+    setBucketCount                   -                  Устанавливает количество бакетов
+    setMaxLoadFactor                 -                  Устанавливает maxLoadFactor
+    setGainFactor                    -                  Устанавливает gainFactor
+
+    Поиск__________________________________________________________________________________________________________
+
+    find                             -                  Ищет элемент с конкретным ключом
+    contains                         -                  Проверяет есть ли в контейнере элемент с конкретным ключом
+    countByKey                       -                  Возвращает количество элементов с конкретным ключом
+    equalRange                       -                  Возвращает диапазон элементов с конкретным ключом
+
+    Вставка________________________________________________________________________________________________________
+
+    insert                           -                  Вставляет новый элемент(-ы) в контейнер
+
+    Удаление_______________________________________________________________________________________________________
+
+    erase                            -                  Удаляет элемент(-ы) из контейнера
+    eraseEqual                       -                  Удаляет все элементы с конкретным ключом
+
+    Модификация____________________________________________________________________________________________________
+
+    clear                            -                  Очищает контент контейнера
+    swap                             -                  Свапает контент двух контейнеров
+    merge                            -                  Перемещает элементы из другого контейнера
+    shrinkToFit                      -                  Уменьшает количество бакетов
+
+    Итерирование___________________________________________________________________________________________________
+
+    beforeBegin(cbeforeBegin)        -                  Возвращает итератор на фиктивный элемент перед begin
+    begin(cbegin)                    -                  Возвращает итератор на первый элемент контейнера
+    back(cback)                      -                  Возвращает итератор на последний элемент контейнера
+    end(cend)                        -                  Возвращает итератор на фиктивный элемент после back
+
+
+
+
+*Далее HashTable - псевдоним для конкретного имени контейнера, например, HashMap
+
+HashTable<...>::HashTable__________________________________________________________________________________________
+    
+    (InsertType - псевдоним для типа хранимой информации, для Set-ов это KeyType, для Map-ов PairType)
+
+    1. HashTable()
+
+    2. HashTable(size_t _bucketCount)
+
+    3. HashTable(size_t _bucketCount, std::initializer_list<InsertType> _initList)
+    
+    template<typename InputIterator>
+    4. HashTable(size_t _bucketCount, InputIterator _first, InputIterator _last)
+
+    5. HashTable(const HashTable& _other)
+
+    6. HashTable(HashTable&& _other)
+
+
+    1: Создает пустой контейнер
+    2: Создает пустой контейнер с количеством бакетов равным _bucketCount
+    3: Создает контейнер с количеством бакетов равным _bucketCount, содержащий допустимые элементы из списка инициализации
+    (повторяющиеся элементы будут проигнорированы non-multi контейнером)
+    4: Создает контейнер с количеством бакетов равным _bucketCount, содержащий допустимые элементы из дипазона итераторов
+    (повторяющиеся элементы будут проигнорированы non-multi контейнером). При разыменовывании, итератор должен давать InsertType данные
+    5: Конструктор копирования, создает контейнер содержащий те же элементы, что и _other
+    6: Конструктор перемещения, создает контейнер и перемещает в него все элементы из _other
+
+
+HashTable<...>::size_______________________________________________________________________________________________
+
+    1. size_t size() const noexcept
+
+    1: Возвращает текущее количество элементов в контейнере
+
+
+HashTable<...>::isEmpty____________________________________________________________________________________________
+
+    1. bool isEmpty() const noexcept
+
+    1: Возвращает true если контейнер пуст, в противном случае возвращает false
+
+
+HashTable<...>::getBucketCount_____________________________________________________________________________________
+
+    1. size_t getBucketCount() const noexcept
+
+    1: Возвращает текущее количество элементов в контейнере
+
+
+HashTable<...>::getLoadFactor______________________________________________________________________________________
+
+    1. float getLoadFactor() const noexcept
+
+    1: Возвращает текущий loadFactor(соотношение elementCount / bucketCount)
+
+
+HashTable<...>::getMaxLoadFactor___________________________________________________________________________________
+
+    1. float getMaxLoadFactor() const noexcept
+
+    1: Возвращает максимальный loadFactor, при превышении которого произойдет расширение массива бакетов.
+
+
+HashTable<...>::getGainFactor______________________________________________________________________________________
+
+    1. float getGainFactor() const noexcept
+
+    1: Возвращает текущий gainFactor(при выделении нового массива бакетов, его размер будет bucketCount * gainFactor)
+
+
+HashTable<...>::reserve____________________________________________________________________________________________
+
+    1. void reserve(size_t _requiredElementCount) noexcept
+
+    1: Делает так, чтобы выделенного массива бакетов хватило для вставки _requiredElementCount элментов, без перевыделения
+
+
+HashTable<...>::setBucketCount_____________________________________________________________________________________
+
+    1. bool setBucketCount(size_t _newBucketCount) noexcept
+
+    1: Пытается изменить количество бакетов и перевыделить массив. Если массива размером _newBucketCount бакетов не хватит,
+    чтобы разместить текущее количество элементов без перевыделения, ничего не делает и возвращает false.
+    В случае успеха возвращает true
+
+
+HashTable<...>::setMaxLoadFactor___________________________________________________________________________________
+
+   1. bool setMaxLoadFactor(float _newMaxLoadFactor) noexcept
+
+   1: Пытается изменить текущий maxLoadFactor. Если _newMaxLoadFactor <= 0, ничего не делает и возвращает false.
+   В случае успеха возвращает true
+
+
+HashTable<...>::setGainFactor______________________________________________________________________________________
+
+   1. bool setGainFactor(float _newGainFactor) noexcept
+
+   1: Пытается изменить текущий gainFactor. Если _newGainFactor <= 0, ничего не делает и возвращает false.
+   В случае успеха возвращает true
+
+
+HashTable<...>::find_______________________________________________________________________________________________
+
+   HashSet и HashMultiSet__________________________________________________________________________________________
+
+   1.1 IteratorType find(const KeyType& _key) const noexcept
+
+   HashMap и HashMultiMap__________________________________________________________________________________________
+
+   2.1 IteratorType find(const KeyType& _key) noexcept
+
+   2.2 ConstIteratorType find(const KeyType& _key) const noexcept
+
+
+   1.1 - 2.2: Ищет в контейнере элемент с ключом эквивалентным _key, в случае успеха возвращает итератор на найденный элемент.
+   В противном случае возвращает end() 
+
+
+HashTable<...>::contains__________________________________________________________________________________________
+
+   1. bool contains(const KeyType& _key) const noexcept
+
+   1: Проверяет есть ли в контейнере элемент с ключом эквивалентным _key, в случае успеха возвращает true, 
+   в противном случае false
+
+HashTable<...>::countByKey________________________________________________________________________________________
+
+   1. size_t countByKey(const KeyType& _key) const noexcept
+
+   1: Возвращает количество элементов с ключом эквивалентным _key
+
+HashTable<...>::equalRange________________________________________________________________________________________
+
+   HashSet и HashMultiSet_________________________________________________________________________________________
+
+   1.1 std::pair<IteratorType, IteratorType> equalRange(const KeyType& _key) const noexcept 
+
+   HashMap и HashMultiMap_________________________________________________________________________________________
+
+   2.1 std::pair<IteratorType, IteratorType> equalRange(const KeyType& _key) noexcept
+
+   2.2 std::pair<ConstIteratorType, ConstIteratorType> equalRange(const KeyType& _key) const noexcept
+
+
+   1.1 - 2.2: Возвращает пару итераторов на начало и конец диапазона элементов с ключом эквивалентным _key.
+   Если таких элементов нет, возвращает пару итераторов end()
+
+
+HashTable<...>::insert____________________________________________________________________________________________
+
+   HashSet и HashMultiSet_________________________________________________________________________________________
+
+   1.1 IteratorType insert(const KeyType& _key)
+
+   1.2 IteratorType insert(KeyType&& _key)
+
+   1.3 void insert(std::initializer_list<KeyType> _initList)
+   
+   template<typename InputIterator>
+   1.4 void insert(InputIterator _first, InputIterator _last)
+
+   HashMap и HashMultiMap_________________________________________________________________________________________
+
+   2.1 IteratorType insert(const KeyType& _key, const ValueType& _value)
+
+   2.2 IteratorType insert(KeyType&& _key, const ValueType& _value)
+
+   2.3 IteratorType insert(const KeyType& _key, ValueType&& _value)
+
+   2.4 IteratorType insert(KeyType&& _key, ValueType&& _value)
+
+   2.5 IteratorType insert(const std::pair<KeyType, ValueType>& _pair)
+
+   2.6 IteratorType insert(std::pair<KeyType, ValueType>&& _pair)
+
+   2.7 void insert(std::initializer_list<std::pair<KeyType, ValueType>> _initList)
+
+   template<typename InputIterator>
+   2.8 void insert(InputIterator _first, InputIterator _last)
+
+
+   1.1 - 1.2: Пытается добавить новый элемент в контейнер, примает параметры, как по const l-value, так и по r-value ссылкам.
+   2.1 - 2.6: В случае успешной вставки возвращает итератор на добавленный элемент, в противном случае возвращает end()
+
+   1.3 и 2.7: Пытается добавить элементы из списка инициализации, ничего не возвращает
+
+   1.4 и 2.8: Пытается добавить элементы из диапазона итераторов. При разыменовывании итераторы должны давать данные
+   KeyType для Set и PairType для Map. Ничего не возвращает
+
+
+HashTable<...>::erase_____________________________________________________________________________________________
+
+   1.1 size_t erase(const KeyType& _key)
+
+   1.2 size_t erase(IteratorType _iter)
+
+   1.3 size_t erase(IteratorType _first, IteratorType _last)
+
+
+   1.1: Пытается удалить первый найденный элемент с ключом эквивалентным _key. В случае успеха возвращает 1,
+   в противном случае возвращает 0
+
+   1.2: Пытается удалить элемент по итератору. Если итератор не валиден, ничего не удаляет и возвращает 0.
+   В противном случае выполняет удаление и возвращает 1
+
+   1.3 Пытается удалить элементы из диапазона между двух итераторов. Если один из итератор не валиден или 
+   они принадлежат разным контейнерам(экземплярам), ничего не удаляет и возвращает 0. В противном случае
+   выполняет удаление и возвращает количество удаленных элементов
+
+
+HashTable<...>::eraseEqual________________________________________________________________________________________
+
+   1. size_t eraseEqual(const KeyType& _key)
+
+   1: Пытается удалить все элементы с ключом эквивалентным _key. Возвращает количество удаленных элементов
+
+
+HashTable<...>::clear_____________________________________________________________________________________________
+   
+   1. void clear()
+
+   1: Удаляет все элементы из контейнера
+
+
+HashTable<...>::swap______________________________________________________________________________________________
+
+   1. void swap(HashTable& _other) noexcept
+
+   1: Меняет местами содержимое текущего контейнера с _other
+
+
+HashTable<...>::merge_____________________________________________________________________________________________
+
+   1. void merge(HashTable& _source) noexcept
+
+   1: Перемещает элементы из _source в текущий контейнер
+
+
+HashTable<...>::shrinkToFit_______________________________________________________________________________________
+
+   1. void shrinkToFit() noexcept
+
+   1: Перевыделяет массив бакетов минимально возможного размера для текущего количества элементов
+
+
+HashTable<...>::beforeBegin(cbeforeBegin)_________________________________________________________________________
+
+   HashSet и HashMultiSet_________________________________________________________________________________________
+
+   1.1 IteratorType beforeBegin() const noexcept
+
+   HashMap и HashMultiMap_________________________________________________________________________________________
+
+   2.1 IteratorType beforeBegin() noexcept
+
+   2.2 ConstIteratorType beforeBegin() const noexcept 
+
+   2.3 ConstIteratorType cbeforeBegin() const noexcept 
+
+
+   1.1 - 2.3: Возвращает итератор на фиктивный элемент перед begin()
+
+
+HashTable<...>::begin(cbegin)_____________________________________________________________________________________
+
+   HashSet и HashMultiSet_________________________________________________________________________________________
+
+   1.1 IteratorType begin() const noexcept
+
+   HashMap и HashMultiMap_________________________________________________________________________________________
+
+   2.1 IteratorType begin() noexcept
+
+   2.2 ConstIteratorType begin() const noexcept 
+
+   2.3 ConstIteratorType cbegin() const noexcept 
+
+   
+   1.1 - 2.3: Возвращает итератор на первый элемент контейнера
+
+
+HashTable<...>::back(cback)_______________________________________________________________________________________
+
+   HashSet и HashMultiSet_________________________________________________________________________________________
+
+   1.1 IteratorType back() const noexcept
+
+   HashMap и HashMultiMap_________________________________________________________________________________________
+
+   2.1 IteratorType back() noexcept
+
+   2.2 ConstIteratorType back() const noexcept 
+
+   2.3 ConstIteratorType cback() const noexcept
+
+   1.1 - 2.3: Возвращает итератор на последний элемент контейнера
+
+
+HashTable<...>::end(cend)_________________________________________________________________________________________
+
+   HashSet и HashMultiSet_________________________________________________________________________________________
+
+   1.1 IteratorType end() const noexcept
+
+   HashMap и HashMultiMap_________________________________________________________________________________________
+
+   2.1 IteratorType end() noexcept
+
+   2.2 ConstIteratorType end() const noexcept 
+
+   2.3 ConstIteratorType cend() const noexcept
+
+   1.1 - 2.3: Возвращает итератор на фиктивный элемент после back() 
